@@ -1,0 +1,37 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* background-image: url("/Users/saurabhmishra/Downloads/top-view-artificial-grass-soccer-field-background-texture.jpg"); 
+  background-size: cover; 
+  background-repeat: no-repeat;
+  image-rendering: optimizeQuality; */
+ 
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.background-overlay {
+  position: absolute; /* Or relative, depending on your layout */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Adjust the alpha value for transparency */
+  z-index: 0; /* Place it behind the FileUpload component */
+}
+
+.file-upload-container {
+  position: relative;
+  z-index: 1;
+}
