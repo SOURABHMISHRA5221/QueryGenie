@@ -31,7 +31,7 @@ const FileUpload = () => {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      fetch('/api/upload', {
+      fetch('https://queryginnebackend-496094639433.us-central1.run.app/uploadFile', {
         method: 'POST',
         body: formData,
       })
