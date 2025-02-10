@@ -2,6 +2,9 @@ from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
 from service.queryGenerator import generateQuery
 from service.queryExecutor import executeCursor,getCreateTableQuery
+from dotenv import load_dotenv
+
+
 
 
 app = FastAPI()
@@ -36,4 +39,5 @@ async def process_query(payload: QueryPayload):
 
 if __name__ == "__main__":
     import uvicorn
+    load_dotenv()
     uvicorn.run(app, host="127.0.0.1", port=8000)
