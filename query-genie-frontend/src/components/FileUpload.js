@@ -18,16 +18,41 @@ const UploadButton = styled.button`
   }
 `;
 
+const QueryInput = styled.input`
+  display: block;
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
+
+const SubmitButton = styled(UploadButton)`
+  margin-top: 5px;
+`;
+
+const OutputContainer = styled.div`
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
+
 const FileUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [query, setQuery] = useState('');
+  const [output, setOutput] = useState(null);
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
+    setUploadSuccess(false); // Reset query input visibility on new file selection
+    setOutput(null); // Reset output on new file selection
   };
 
   const handleUpload = () => {
     if (selectedFile) {
-      console.log('Uploading:', selectedFile);
       const formData = new FormData();
       formData.append('file', selectedFile);
 
@@ -38,6 +63,7 @@ const FileUpload = () => {
       .then(response => response.json())
       .then(data => {
         console.log('Success:', data);
+        setUploadSuccess(true);
       })
       .catch(error => {
         console.error('Error:', error);
@@ -45,11 +71,43 @@ const FileUpload = () => {
     }
   };
 
+  const handleQuerySubmit = () => {
+    fetch('https://queryginnebackend-496094639433.us-central1.run.app/processQuery', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Query Response:', data);
+      setOutput(data.output);
+    })
+    .catch(error => {
+      console.error('Query Error:', error);
+    });
+  };
+
   return (
     <div>
       <input type="file" onChange={handleFileChange} />
       <UploadButton onClick={handleUpload} disabled={!selectedFile}>Upload</UploadButton>
       {selectedFile && <p>Selected File: {selectedFile.name}</p>}
+      {uploadSuccess && (
+        <div>
+          <QueryInput
+            type="text"
+            placeholder="Enter your Query"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <SubmitButton onClick={handleQuerySubmit} disabled={!query.trim()}>Submit Query</SubmitButton>
+        </div>
+      )}
+      {output && (
+        <OutputContainer>
+          <strong>Output:</strong> {output}
+        </OutputContainer>
+      )}
     </div>
   );
 };
