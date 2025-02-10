@@ -5,8 +5,7 @@ FROM python:latest
 WORKDIR /app
 
 # Copy the required files
-COPY requirements.txt .
-COPY app.py .
+COPY . .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
