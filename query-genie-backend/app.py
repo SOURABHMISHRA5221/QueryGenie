@@ -11,7 +11,7 @@ class QueryPayload(BaseModel):
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello from Server"}
+    return {"message": "Hello from Server last updated on 10th Feb 2023"}
 
 @app.post("/uploadFile")
 async def upload_file(file: UploadFile = File(...)):
