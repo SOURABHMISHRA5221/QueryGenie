@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 # Define the API endpoint URL and API key
 url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent'
-api_key = os.environ.get("GEMINI_KEY")
+api_key = os.environ.get("API_KEY")
 
 
 def generateQuery(create_table_queries, prompt):
