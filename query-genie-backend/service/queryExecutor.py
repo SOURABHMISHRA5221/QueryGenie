@@ -18,7 +18,9 @@ def getCreateTableQuery(csvFile):
         cursor.execute(insert_sql)
     return create_table_query
 
-def executeCursor(text):
+import csv
+
+def executeCursor(text, filename="output.csv"):
     cursor.execute(text)
     results = cursor.fetchall()
 
@@ -30,7 +32,13 @@ def executeCursor(text):
     
     output = ",".join(column_names) + "\n"  # Join column names with commas
     
-    # Append each row as a comma-separated line
+    # Write to CSV file
+    with open(filename, mode="w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(column_names)  # Write header
+        writer.writerows(results)  # Write data rows
+
+    # Append each row as a comma-separated line to output string
     for row in results:
         output += ",".join(map(str, row)) + "\n"
     

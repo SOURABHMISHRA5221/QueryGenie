@@ -30,19 +30,38 @@ async def upload_file(file: UploadFile = File(...)):
         f.write(contents.decode("utf-8"))  # Write file content to Test.csv
     return {"filename": file.filename}
 
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+import io
+
+app = FastAPI()
+
 @app.post("/processQuery")
 async def process_query(payload: QueryPayload):
     query_text = payload.query
-    print(f"Received query: {query_text}")  # Print the query for debugging
+    print(f"Received query: {query_text}")  # Debugging
+
     create_table_query = getCreateTableQuery('Test.csv')
     generated_query = generateQuery(create_table_query, query_text)
     print(f"Generated query: {generated_query}")
-    
+
     if generated_query.startswith("Error"):
         return {"error": generated_query}
-    else:
-        output = executeCursor(generated_query)
-        return {"output": output}
+    
+    # Get query output and CSV content
+    csv_filename = "results.csv"
+    output = executeCursor(generated_query, csv_filename)
+
+    # Read CSV content into memory
+    with open(csv_filename, "r") as file:
+        csv_content = file.read()
+
+    # Create an in-memory file-like object
+    csv_stream = io.StringIO(csv_content)
+
+    # Return CSV file as a response
+    return StreamingResponse(csv_stream, media_type="text/csv", headers={"Content-Disposition": f"attachment; filename={csv_filename}"})
+
 
 if __name__ == "__main__":
     import uvicorn
