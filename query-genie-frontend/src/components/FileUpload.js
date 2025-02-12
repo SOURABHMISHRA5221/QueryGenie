@@ -46,11 +46,20 @@ const FileUpload = () => {
   const [csvUrl, setCsvUrl] = useState(null); // Store CSV download link
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-    setUploadSuccess(false);
-    setCsvUrl(null); // Reset CSV link on new file selection
+    const file = event.target.files[0];
+  
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) { // 10 MB limit
+        alert("File size exceeds 10MB. Please upload a smaller file.");
+        setSelectedFile(null);
+        return;
+      }
+      
+      setSelectedFile(file);
+      setUploadSuccess(false);
+      setCsvUrl(null);
+    }
   };
-
   const handleUpload = () => {
     if (selectedFile) {
       const formData = new FormData();
