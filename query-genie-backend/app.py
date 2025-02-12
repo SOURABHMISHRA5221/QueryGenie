@@ -4,6 +4,8 @@ from pydantic import BaseModel
 from service.queryGenerator import generateQuery
 from service.queryExecutor import executeCursor, getCreateTableQuery
 from dotenv import load_dotenv
+from fastapi.responses import StreamingResponse
+import io
 
 app = FastAPI()
 
@@ -29,12 +31,6 @@ async def upload_file(file: UploadFile = File(...)):
     with open("Test.csv", 'w') as f:
         f.write(contents.decode("utf-8"))  # Write file content to Test.csv
     return {"filename": file.filename}
-
-from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
-import io
-
-app = FastAPI()
 
 @app.post("/processQuery")
 async def process_query(payload: QueryPayload):
