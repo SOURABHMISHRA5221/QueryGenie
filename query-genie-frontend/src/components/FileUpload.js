@@ -43,12 +43,12 @@ const FileUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [query, setQuery] = useState('');
-  const [output, setOutput] = useState(null);
+  const [csvUrl, setCsvUrl] = useState(null); // Store CSV download link
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
-    setUploadSuccess(false); // Reset query input visibility on new file selection
-    setOutput(null); // Reset output on new file selection
+    setUploadSuccess(false);
+    setCsvUrl(null); // Reset CSV link on new file selection
   };
 
   const handleUpload = () => {
@@ -77,10 +77,15 @@ const FileUpload = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query }),
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Query Response:', data);
-      setOutput(data.output);
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch CSV');
+      }
+      return response.blob();
+    })
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      setCsvUrl(url); // Store the blob URL for downloading
     })
     .catch(error => {
       console.error('Query Error:', error);
@@ -103,9 +108,13 @@ const FileUpload = () => {
           <SubmitButton onClick={handleQuerySubmit} disabled={!query.trim()}>Submit Query</SubmitButton>
         </div>
       )}
-      {output && (
+      {csvUrl && (
         <OutputContainer>
-          <strong>Output:</strong> {output}
+          <strong>Query Processed!</strong>
+          <br />
+          <a href={csvUrl} download="query_results.csv">
+            <UploadButton>Download Results</UploadButton>
+          </a>
         </OutputContainer>
       )}
     </div>
