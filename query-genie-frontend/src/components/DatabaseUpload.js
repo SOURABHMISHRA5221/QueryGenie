@@ -71,7 +71,7 @@ const DatabaseUpload = () => {
       connectionString: encryptedConnectionString
     };
 
-    fetch('http://localhost:8000/mongoConnection', {
+    fetch('https://queryginnebackend-496094639433.us-central1.run.app/mongoConnection', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
