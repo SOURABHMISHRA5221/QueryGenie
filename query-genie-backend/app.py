@@ -3,8 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from service.queryGenerator import generateQuery
 from service.queryExecutor import executeCursor, getCreateTableQuery
+from service.mongoService import createClient, getSchema
 from dotenv import load_dotenv
 from fastapi.responses import StreamingResponse
+from utils.encrypt import decrypt_connection_string
 import io
 
 app = FastAPI()
@@ -21,9 +23,16 @@ app.add_middleware(
 class QueryPayload(BaseModel):
     query: str
 
+from typing import List
+
+class MongoPayload(BaseModel):
+    database: str
+    collections: List[str]
+    connectionString: str
+
 @app.get("/")
 def read_root():
-    return {"message": "Hello from Server last updated on 10th Feb 2023"}
+    return {"message": "Hello from Server last updated on 15th Feb 2023"}
 
 @app.post("/uploadFile")
 async def upload_file(file: UploadFile = File(...)):
@@ -31,6 +40,20 @@ async def upload_file(file: UploadFile = File(...)):
     with open("Test.csv", 'w') as f:
         f.write(contents.decode("utf-8"))  # Write file content to Test.csv
     return {"filename": file.filename}
+
+@app.post("/mongoConnection")
+async def mongo_connection(payload: MongoPayload):
+    connection_string = decrypt_connection_string(payload.connectionString)
+    if "Decryption Error" in connection_string:
+        return {"error": connection_string}
+    print(connection_string)
+    collections       = payload.collections
+    database          = payload.database
+    client = createClient(connection_string)
+    print("Connection completed")
+    schema = getSchema(client,database,collections)
+    return {"message": "Hello from Server last updated on 15th Feb 2023","schema":schema}
+
 
 @app.post("/processQuery")
 async def process_query(payload: QueryPayload):
