@@ -106,7 +106,7 @@ const DatabaseUpload = () => {
       } else {
         clearInterval(interval);
       }
-    }, 50);
+    }, 10);
   };
 
   const handleCopy = () => {
