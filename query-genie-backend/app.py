@@ -1,7 +1,7 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from service.queryGenerator import generateQuery
+from service.queryGenerator import generateQuery, generateQueryForMongo
 from service.queryExecutor import executeCursor, getCreateTableQuery
 from service.mongoService import createClient, getSchema
 from dotenv import load_dotenv
@@ -29,6 +29,7 @@ class MongoPayload(BaseModel):
     database: str
     collections: List[str]
     connectionString: str
+    prompt: str
 
 @app.get("/")
 def read_root():
@@ -49,10 +50,12 @@ async def mongo_connection(payload: MongoPayload):
     print(connection_string)
     collections       = payload.collections
     database          = payload.database
-    client = createClient(connection_string)
+    client            = createClient(connection_string)
+    prompt            = payload.prompt
     print("Connection completed")
-    schema = getSchema(client,database,collections)
-    return {"message": "Hello from Server last updated on 15th Feb 2023","schema":schema}
+    schema            = getSchema(client,database,collections)
+    response          = generateQueryForMongo(str(schema), prompt)
+    return {"message": "Hello from Server last updated on 16th Feb 2023","schema":schema,"response":response}
 
 
 @app.post("/processQuery")
