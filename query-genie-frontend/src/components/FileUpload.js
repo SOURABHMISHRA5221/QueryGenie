@@ -43,23 +43,30 @@ const FileUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [query, setQuery] = useState('');
-  const [csvUrl, setCsvUrl] = useState(null); // Store CSV download link
+  const [csvUrl, setCsvUrl] = useState(null);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-  
+
     if (file) {
-      if (file.size > 10 * 1024 * 1024) { // 10 MB limit
+      if (!file.name.endsWith('.csv')) {
+        alert('Please upload a CSV file.');
+        setSelectedFile(null);
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
         alert("File size exceeds 10MB. Please upload a smaller file.");
         setSelectedFile(null);
         return;
       }
-      
+
       setSelectedFile(file);
       setUploadSuccess(false);
       setCsvUrl(null);
     }
   };
+
   const handleUpload = () => {
     if (selectedFile) {
       const formData = new FormData();
@@ -69,13 +76,17 @@ const FileUpload = () => {
         method: 'POST',
         body: formData,
       })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data);
-        setUploadSuccess(true);
+      .then(response => {
+        if (response.ok) {
+          console.log('File uploaded successfully');
+          setUploadSuccess(true);
+        } else {
+          throw new Error('File upload failed');
+        }
       })
       .catch(error => {
-        console.error('Error:', error);
+        console.error('Upload Error:', error);
+        alert('An error occurred while uploading the file.');
       });
     }
   };
@@ -94,18 +105,20 @@ const FileUpload = () => {
     })
     .then(blob => {
       const url = window.URL.createObjectURL(blob);
-      setCsvUrl(url); // Store the blob URL for downloading
+      setCsvUrl(url);
     })
     .catch(error => {
       console.error('Query Error:', error);
+      alert('An error occurred while processing the query.');
     });
   };
 
   return (
     <div>
-      <input type="file" onChange={handleFileChange} />
+      <input type="file" accept=".csv" onChange={handleFileChange} />
       <UploadButton onClick={handleUpload} disabled={!selectedFile}>Upload</UploadButton>
       {selectedFile && <p>Selected File: {selectedFile.name}</p>}
+      
       {uploadSuccess && (
         <div>
           <QueryInput
@@ -117,6 +130,7 @@ const FileUpload = () => {
           <SubmitButton onClick={handleQuerySubmit} disabled={!query.trim()}>Submit Query</SubmitButton>
         </div>
       )}
+
       {csvUrl && (
         <OutputContainer>
           <strong>Query Processed!</strong>
