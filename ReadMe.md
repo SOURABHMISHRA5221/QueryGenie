@@ -2,8 +2,7 @@
 
 ## Frontend
 
-- [Query Genie App](https://query-genie.vercel.app/)
-- [Query Genie API](https://querygenie-496094639433.us-central1.run.app)
+- [Query Genie APP](https://querygenie-496094639433.us-central1.run.app)
 
 ## Backend
 
